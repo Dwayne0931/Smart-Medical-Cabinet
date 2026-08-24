@@ -4,9 +4,9 @@ by barcode before dispensing, and keep track of stock (quantities, expiry dates,
 An ESP8266 + Arduino Uno light up a physical LED to help staff find the right medicine.
 
 From, 
-DWAYNE PAN KAY YOUNG - 18DIT24F1998 (SYSTEM)
-PRAVIN A/L LINGESWARAN - 18DIT24F1041 (DEVICE)
-PREETHIBA A/P NARAYANAN - 18DIT24F1061 (DOCUMENTATION)
+DWAYNE PAN KAY YOUNG - 18DIT24F1998 (SYSTEM) <br>
+PRAVIN A/L LINGESWARAN - 18DIT24F1041 (DEVICE) <br>
+PREETHIBA A/P NARAYANAN - 18DIT24F1061 (DOCUMENTATION) <br>
 
 ## 1. Project overview
 
