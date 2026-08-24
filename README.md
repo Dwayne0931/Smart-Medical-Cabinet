@@ -3,7 +3,7 @@ a web app for clinic staff to look up medicines, verify them
 by barcode before dispensing, and keep track of stock (quantities, expiry dates, batches).
 An ESP8266 + Arduino Uno light up a physical LED to help staff find the right medicine.
 
-From, 
+From, <br>
 DWAYNE PAN KAY YOUNG - 18DIT24F1998 (SYSTEM) <br>
 PRAVIN A/L LINGESWARAN - 18DIT24F1041 (DEVICE) <br>
 PREETHIBA A/P NARAYANAN - 18DIT24F1061 (DOCUMENTATION) <br>
