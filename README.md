@@ -38,44 +38,14 @@ low-stock and expiring-soon warnings.
 - HTML, CSS, JavaScript 
 - ESP8266 + Arduino Uno (Arduino C++) for the LED hardware
 
-## 4. Folder structure
 
-smc/
-├── IOT Code/
-│   ├── esp8266.cpp          # connects to WiFi, receives /led requests, forwards to Arduino
-│   └── arduinoUNO.cpp       # receives serial (tx rx) commands, turns LEDs on/off
-│   
-├── static/
-│   ├── style.css
-│   ├── scan.js               # verify page logic (search, locate, scan, submit)
-│   └── search.js              # medicines page table search
-├── templates/                 # all the HTML pages
-├── app.py                     # all Flask routes
-├── init_db.py                 # creates the MySQL tables and demo data
-├── requirements.txt
-└── .env                        # your config 
-
-```
-## 5. Requirements
-
-- Python 3.10 or newer
-- XAMPP (for MySQL) 
-- Install Python dependencies
-pip install -r requirements.txt
-Flask
-PyMySQL
-python-dotenv
-cryptography
-
-```
-
-## 6. Create the MySQL database
+## 4. Create the MySQL database
 
 In phpMyAdmin, create `smart_medicine` as the database name
 tables - `init_db.py` does that for you 
 
 
-## 7. Configure .env
+## 5. Configure .env
 
 Copy `.env.example` to `.env`:
 
@@ -84,7 +54,7 @@ The default XAMPP MySQL settings (root user, no password) already match the othe
 so you usually don't need to change `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, or
 `DB_NAME` unless your setup is different.
 
-## 7. Initialise the database
+## 6. Initialise the database
 
 With MySQL running in XAMPP:
 
@@ -97,18 +67,18 @@ them with 50 demo medicines, a demo staff account (`staff1` / `password123`), an
 starter stock. Re-running this script wipes and recreates everything - handy if the demo
 data gets messy while testing.
 
-## 8. Run the Flask application
+## 7. Run the Flask application
 
 ```
 python app.py
 ```
 
-## 9. Access the application
+## 8. Access the application
 
 Open `http://localhost:5000` in your browser. Log in with `staff1` / `password123`,
 or register a new account.
 
-## 10. How the ESP8266/Arduino component works
+## 9. How the ESP8266/Arduino component works
 
 Two boards work together:
 
