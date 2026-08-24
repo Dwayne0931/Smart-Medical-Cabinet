@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Medicines - Smart Medical Cabinet</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+    <div class="navbar">
+        <div class="brand">SMC - Clinic Inventory</div>
+        <div>
+            <a href="/">Dashboard</a>
+            <a href="/medicines">Medicines</a>
+            <a href="/scan">Verify</a>
+            <a href="/reports">Reports</a>
+            <a href="/about">About</a>
+            <a href="/logout">Logout ({{ session.username }})</a>
+        </div>
+    </div>
+
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+        {% for msg in messages %}
+        <div class="flash">{{ msg }}</div>
+        {% endfor %}
+        {% endwith %}
+
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h1>Medicines</h1>
+            <div>
+                <a class="btn btn-outline" href="/medicines/import">Import CSV</a>
+                <a class="btn" href="/medicines/add">Add Medicine</a>
+            </div>
+        </div>
+
+        <p class="muted">Search medicine by ID, Name, Dosage, Barcode, Location </p>
+        <input type="text" id="searchInput" class="search-input" placeholder="Search medicine, e.g. Metformin...">
+        <p class="muted" id="noResults" style="display:none;">No medicine matches your search.</p>
+
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Dosage</th>
+                <th>Category</th>
+                <th>Barcode</th>
+                <th>Location</th>
+                <th>LED</th>
+                <th>Total Qty</th>
+                <th></th>
+            </tr>
+            {% for m in medicines %}
+            <tr>
+                <td>{{ m.medicine_id }}</td>
+                <td>{{ m.name }}</td>
+                <td>{{ m.dosage }}</td>
+                <td>{{ m.category }}</td>
+                <td>{{ m.barcode }}</td>
+                <td>{{ m.location }}</td>
+                <td>{% if m.led_index is not none %}{{ m.led_index }}{% else %}<span class="muted">-</span>{% endif %}</td>
+                <td class="{% if m.total_qty <= m.low_stock_threshold %}danger{% endif %}">{{ m.total_qty }}</td>
+                <td>
+                    <a class="btn-small" href="/medicines/{{ m.medicine_id }}/edit">Edit</a>
+                    <form method="POST" action="/medicines/{{ m.medicine_id }}/delete"
+                        onsubmit="return confirm('Remove {{ m.name }}?');" style="display:inline">
+                        <button type="submit" class="btn-small btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <script src="{{ url_for('static', filename='search.js') }}"></script>
+</body>
+
+</html>

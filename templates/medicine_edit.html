@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Medicine - Smart Medical Cabinet</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+    <div class="navbar">
+        <div class="brand">SMC - Clinic Inventory</div>
+        <div>
+            <a href="/">Dashboard</a>
+            <a href="/medicines">Medicines</a>
+            <a href="/scan">Verify</a>
+            <a href="/reports">Reports</a>
+            <a href="/about">About</a>
+            <a href="/logout">Logout ({{ session.username }})</a>
+        </div>
+    </div>
+
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+        {% for msg in messages %}
+        <div class="flash">{{ msg }}</div>
+        {% endfor %}
+        {% endwith %}
+
+        <h1>Edit Medicine - {{ medicine.name }}</h1>
+
+        <div class="card">
+            <h3>Medicine Details</h3>
+            <form method="POST" class="form-grid">
+                <div><label>Name</label><input name="name" value="{{ form.get('name') if form else medicine.name }}"
+                        required></div>
+                <div><label>Dosage</label><input name="dosage"
+                        value="{{ form.get('dosage') if form else medicine.dosage }}" required></div>
+                <div><label>Category</label><input name="category"
+                        value="{{ (form.get('category') if form else medicine.category) or '' }}"></div>
+                <div><label>Barcode</label><input name="barcode"
+                        value="{{ form.get('barcode') if form else medicine.barcode }}" required></div>
+                <div><label>Storage Location</label><input name="location"
+                        value="{{ (form.get('location') if form else medicine.location) or '' }}"></div>
+                <div><label>Low Stock Threshold</label><input name="low_stock_threshold" type="number" min="0"
+                        value="{{ form.get('low_stock_threshold') if form else medicine.low_stock_threshold }}"></div>
+                <div>
+                    <label>LED Index (optional)</label>
+                    <input name="led_index" type="number" min="0" placeholder="leave blank if no LED wired up"
+                        value="{{ form.get('led_index','') if form else (medicine.led_index if medicine.led_index is not none else '') }}">
+                </div>
+                <div class="full-row"><button class="btn" type="submit">Save Changes</button></div>
+            </form>
+        </div>
+
+        <div class="card">
+            <h3>Batches</h3>
+            {% if batches %}
+            <table>
+                <tr>
+                    <th>Batch ID</th>
+                    <th>Expiry Date</th>
+                    <th>Quantity</th>
+                </tr>
+                {% for b in batches %}
+                <tr>
+                    <td>{{ b.batch_id }}</td>
+                    <td>{{ b.expiry_date }}</td>
+                    <td>{{ b.quantity }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% else %}
+            <p class="muted">No batches recorded yet.</p>
+            {% endif %}
+
+            <h3>Add New Batch (Restock)</h3>
+            <form method="POST" action="/medicines/{{ medicine.medicine_id }}/add_batch" class="form-grid">
+                <div><label>Batch ID</label><input name="batch_id" placeholder="e.g. PCM003" required></div>
+                <div><label>Expiry Date</label><input name="expiry_date" type="date" required></div>
+                <div><label>Quantity</label><input name="quantity" type="number" min="0" required></div>
+                <div class="full-row"><button class="btn" type="submit">Add Batch</button></div>
+            </form>
+        </div>
+
+        <a class=btn href="/medicines">Back to Medicines</a>
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Reports - Smart Medical Cabinet</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+    <div class="navbar">
+        <div class="brand">SMC - Clinic Inventory</div>
+        <div>
+            <a href="/">Dashboard</a>
+            <a href="/medicines">Medicines</a>
+            <a href="/scan">Verify</a>
+            <a href="/reports">Reports</a>
+            <a href="/about">About</a>
+            <a href="/logout">Logout ({{ session.username }})</a>
+        </div>
+    </div>
+
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+        {% for msg in messages %}
+        <div class="flash">{{ msg }}</div>
+        {% endfor %}
+        {% endwith %}
+
+        <h1>Reports</h1>
+
+        <div class="card">
+            <h3>Current Inventory (by batch)</h3>
+            <table>
+                <tr>
+                    <th>Medicine</th>
+                    <th>Dosage</th>
+                    <th>Location</th>
+                    <th>Batch</th>
+                    <th>Expiry</th>
+                    <th>Qty</th>
+                </tr>
+                {% for row in inventory %}
+                <tr>
+                    <td>{{ row.name }}</td>
+                    <td>{{ row.dosage }}</td>
+                    <td>{{ row.location }}</td>
+                    <td>{{ row.batch_id }}</td>
+                    <td>{{ row.expiry_date }}</td>
+                    <td>{{ row.quantity }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Stock Movement History</h3>
+            <table>
+                <tr>
+                    <th>Time</th>
+                    <th>Medicine</th>
+                    <th>Action</th>
+                    <th>Change</th>
+                    <th>By</th>
+                    <th>Note</th>
+                </tr>
+                {% for h in history %}
+                <tr>
+                    <td>{{ h.timestamp }}</td>
+                    <td>{{ h.name }}</td>
+                    <td>{{ h.action }}</td>
+                    <td>{{ h.change_qty }}</td>
+                    <td>{{ h.performed_by }}</td>
+                    <td>{{ h.note }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+</body>
+
+</html>

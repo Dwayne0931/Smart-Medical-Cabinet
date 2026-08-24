@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - Smart Medical Cabinet</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+    <div class="navbar">
+        <div class="brand">SMC - Clinic Inventory</div>
+        <div>
+            <a href="/">Dashboard</a>
+            <a href="/medicines">Medicines</a>
+            <a href="/scan">Verify</a>
+            <a href="/reports">Reports</a>
+            <a href="/about">About</a>
+            <a href="/logout">Logout ({{ session.username }})</a>
+        </div>
+    </div>
+
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+        {% for msg in messages %}
+        <div class="flash">{{ msg }}</div>
+        {% endfor %}
+        {% endwith %}
+
+        <h1>Dashboard</h1>
+
+        <div class="dashboard-cards">
+            <div class="card">
+                <div class="card-number">{{ total_medicines }}</div>
+                <div>Total Medicines</div>
+            </div>
+            <div class="card">
+                <div class="card-number">{{ low_stock|length }}</div>
+                <div>Low Stock Alerts</div>
+            </div>
+            <div class="card">
+                <div class="card-number">{{ expiring|length }}</div>
+                <div>Expiring within 30 Days</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Low Stock</h3>
+            {% if low_stock %}
+            <table>
+                <tr>
+                    <th>Medicine</th>
+                    <th>Dosage</th>
+                    <th>Qty Left</th>
+                    <th>Threshold</th>
+                </tr>
+                {% for row in low_stock %}
+                <tr>
+                    <td>{{ row.name }}</td>
+                    <td>{{ row.dosage }}</td>
+                    <td class="danger">{{ row.total_qty }}</td>
+                    <td>{{ row.low_stock_threshold }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% else %}
+            <p class="muted">No low stock items right now.</p>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h3>Expiring Soon</h3>
+            {% if expiring %}
+            <table>
+                <tr>
+                    <th>Medicine</th>
+                    <th>Batch</th>
+                    <th>Expiry</th>
+                    <th>Qty</th>
+                </tr>
+                {% for row in expiring %}
+                <tr>
+                    <td>{{ row.name }} ({{ row.dosage }})</td>
+                    <td>{{ row.batch_id }}</td>
+                    <td class="danger">{{ row.expiry_date }}</td>
+                    <td>{{ row.quantity }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% else %}
+            <p class="muted">Nothing expiring soon.</p>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h3>Recent Transactions</h3>
+            <table>
+                <tr>
+                    <th>Time</th>
+                    <th>Medicine</th>
+                    <th>Action</th>
+                    <th>Change</th>
+                    <th>By</th>
+                    <th>Remaining</th> 
+                </tr>
+                {% for tx in recent_tx %}
+                
+                <tr>
+                    <td>{{ tx.timestamp }}</td>
+                    <td>{{ tx.name }}</td>
+                    <td>{{ tx.action }}</td>
+                    <td>{{ tx.change_qty }}</td>
+                    <td>{{ tx.performed_by }}</td>
+                    <td>{{ tx.remaining }}</td> 
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+</body>
+
+</html>

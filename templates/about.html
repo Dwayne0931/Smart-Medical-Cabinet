@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>About - Smart Medical Cabinet</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+    <div class="navbar">
+        <div class="brand">SMC - Clinic Inventory</div>
+        <div>
+            <a href="/">Dashboard</a>
+            <a href="/medicines">Medicines</a>
+            <a href="/scan">Verify</a>
+            <a href="/reports">Reports</a>
+            <a href="/about">About</a>
+            <a href="/logout">Logout ({{ session.username }})</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>About This System</h1>
+        <p class="muted">Smart Medical Cabinet - a prototype system for verifying medicines by barcode before
+            dispensing, and keeping track of stock.</p>
+
+        <div class="card">
+            <h3>Dashboard</h3>
+            <p>Shows a overview: how many medicines are in the system, which ones are running low on stock,
+                which batches are expiring within 30 days, and the most recent stock changes.</p>
+        </div>
+
+        <div class="card">
+            <h3>Medicines page</h3>
+            <p>Lists every medicine in the system. From here you can:</p>
+            <ul>
+                <li><strong>Add Medicine</strong> - register a new medicine and its first batch (expiry + quantity).
+                </li>
+                <li><strong>Edit</strong> - update a medicine's details, or add a new batch to restock it.</li>
+                <li><strong>Import CSV</strong> - upload a spreadsheet to add many medicines at once.</li>
+                <li><strong>Delete</strong> - remove a medicine and its batches.</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h3>Verify page</h3>
+            <p>This is where staff verify a medicine before giving it to a patient. There are two modes:</p>
+            <ul>
+                <li>
+                    <strong>Guided Verification</strong> - search for a medicine, tick the item and dose needed,
+                    use Locate to light up the compartment (simulated for now), then scan the barcode to confirm
+                    it matches what you selected. Scanned items collect in a list at the bottom; press Submit
+                    to save everything to the database, or Clear All to start over without saving.
+                </li>
+                <p></p>
+                <li>
+                    <strong>Quick Scan</strong> - for when a barcode scanner is plugged directly into the computer.
+                    Just scan each item as you pick it up; it is looked up and added to a list automatically.
+                    Scanning the same item twice adds up to quantity 2. Review the list, then press Submit to
+                    update the database, or Clear All to discard the scans.
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</body>
+
+</html>

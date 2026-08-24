@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Smart Medical Cabinet</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+        {% for msg in messages %}
+        <div class="flash">{{ msg }}</div>
+        {% endfor %}
+        {% endwith %}
+
+        <div class="login-box">
+            <h2>Staff Login</h2>
+            <form method="POST">
+                <label>Username</label>
+                <input type="text" name="username" required autofocus>
+                <label>Password</label>
+                <input type="password" name="password" required>
+                <button class="btn" style="margin-top:14px;" type="submit">Login</button>
+            </form>
+            <p class="muted" style="margin-top:14px;">Demo login: staff1 / password123</p>
+            <p class="muted"><a href="/register">Register an account</a></p>
+        </div>
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,11 @@
+# environment secrets - never commit these files
+.env
+
+# Python
+__pycache__/
+*.pyc
+venv/
+env/
+
+# editor/OS clutter
+.vscode/

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Add Medicine - Smart Medical Cabinet</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+    <div class="navbar">
+        <div class="brand">SMC - Clinic Inventory</div>
+        <div>
+            <a href="/">Dashboard</a>
+            <a href="/medicines">Medicines</a>
+            <a href="/scan">Verify</a>
+            <a href="/reports">Reports</a>
+            <a href="/about">About</a>
+            <a href="/logout">Logout ({{ session.username }})</a>
+        </div>
+    </div>
+
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+        {% for msg in messages %}
+        <div class="flash">{{ msg }}</div>
+        {% endfor %}
+        {% endwith %}
+
+        <h1>Add Medicine</h1>
+
+        <form method="POST" class="form-grid">
+            <div><label>Medicine ID</label><input name="medicine_id" placeholder="M051"
+                    value="{{ form.get('medicine_id','') if form else '' }}" required></div>
+            <div><label>Name</label><input name="name" placeholder="Ibuprofen"
+                    value="{{ form.get('name','') if form else '' }}" required></div>
+            <div><label>Dosage</label><input name="dosage" placeholder="200mg"
+                    value="{{ form.get('dosage','') if form else '' }}" required></div>
+            <div><label>Category</label><input name="category" placeholder="Pain Relief"
+                    value="{{ form.get('category','') if form else '' }}"></div>
+            <div><label>Barcode</label><input name="barcode" placeholder="8991234500123"
+                    value="{{ form.get('barcode','') if form else '' }}" required></div>
+            <div><label>Storage Location</label><input name="location" placeholder="Cabinet A3"
+                    value="{{ form.get('location','') if form else '' }}"></div>
+            <div><label>Low Stock Threshold</label><input name="low_stock_threshold" type="number" min="0"
+                    value="{{ form.get('low_stock_threshold','20') if form else '20' }}"></div>
+            <div>
+                <label>LED Index (optional)</label>
+                <input name="led_index" type="number" min="0" placeholder="leave blank if no LED wired up"
+                    value="{{ form.get('led_index','') if form else '' }}">
+            </div>
+
+            <hr class="full-row">
+
+            <div><label>Initial Batch ID</label><input name="batch_id" placeholder="IBU200-01"
+                    value="{{ form.get('batch_id','') if form else '' }}" required></div>
+            <div><label>Expiry Date</label><input name="expiry_date" type="date"
+                    value="{{ form.get('expiry_date','') if form else '' }}" required></div>
+            <div><label>Initial Quantity</label><input name="quantity" type="number" min="0"
+                    value="{{ form.get('quantity','') if form else '' }}" required></div>
+
+            <div class="full-row"><button class="btn" type="submit">Save Medicine</button></div>
+        </form>
+        <a class=btn href="/medicines">Back to Medicines</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,343 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    color: #222;
+}
+
+a {
+    color: #0f766e;
+}
+
+/* ---------- Top navigation bar ---------- */
+
+.navbar {
+    background: #0f766e;
+    color: white;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.navbar .brand {
+    font-weight: bold;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+    margin-right: 16px;
+}
+
+.navbar a:hover {
+    text-decoration: underline;
+}
+
+/* ---------- Page layout ---------- */
+
+.container {
+    max-width: 950px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.login-box {
+    max-width: 340px;
+    margin: 80px auto;
+    background: white;
+    padding: 24px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+/* ---------- Flash messages ---------- */
+
+.flash {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    border-radius: 4px;
+}
+
+/* ---------- Cards / sections ---------- */
+
+.card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.card h3 {
+    margin-top: 0;
+}
+
+.dashboard-cards {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.dashboard-cards .card {
+    flex: 1;
+    text-align: center;
+}
+
+.card-number {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #0f766e;
+}
+
+/* ---------- Tables ---------- */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    margin-bottom: 16px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px 10px;
+    text-align: left;
+    font-size: 0.9em;
+}
+
+th {
+    background: #f0f0f0;
+}
+
+td:last-child {
+    white-space: nowrap;
+}
+td:last-child form {
+    display: inline-block;
+    margin: 0;
+}
+
+.danger {
+    color: #c0392b;
+    font-weight: bold;
+}
+
+.muted {
+    color: #777;
+    font-size: 0.9em;
+}
+
+/* ---------- Buttons ---------- */
+
+.btn {
+    display: inline-block;
+    background: #0f766e;
+    color: white;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 4px;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+.btn:hover {
+    background: #0b5c56;
+}
+
+.btn-small {
+    display: inline-block;
+    background: #0f766e;
+    color: white;
+    padding: 4px 10px;
+    border: none;
+    border-radius: 4px;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 0.8em;
+}
+
+.btn-danger {
+    background: #c0392b;
+}
+
+.btn-outline {
+    background: white;
+    color: #0f766e;
+    border: 1px solid #0f766e;
+}
+
+/* ---------- Forms ---------- */
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    background: white;
+    padding: 16px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+
+.form-grid label {
+    display: block;
+    font-size: 0.85em;
+    margin-bottom: 4px;
+    color: #555;
+}
+
+.form-grid input {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.full-row {
+    grid-column: 1 / -1;
+}
+
+.login-box label {
+    display: block;
+    margin-top: 10px;
+    font-size: 0.9em;
+}
+
+.login-box input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 4px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* ---------- Verify page: search results, selected list, scan tally ---------- */
+
+.search-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 12px;
+}
+
+.med-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    margin-bottom: 6px;
+    cursor: pointer;
+}
+
+.med-row.checked {
+    border-color: #0f766e;
+    background: #f0fdfa;
+}
+
+.med-loc {
+    margin-left: auto;
+    font-size: 0.8em;
+    color: #777;
+    text-align: right;
+}
+
+.list-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.list-row.verified {
+    border-color: #2e7d32;
+    background: #eafaf0;
+}
+
+.pill {
+    font-size: 0.75em;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+.pill-idle { background: #eee; color: #666; }
+.pill-lit { background: #fff3cd; color: #b8860b; }
+.pill-ok { background: #d4edda; color: #2e7d32; }
+
+.scan-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.scan-row input {
+    flex: 1;
+    padding: 10px;
+    font-size: 1em;
+    border: 2px solid #0f766e;
+    border-radius: 4px;
+}
+
+.result-box {
+    padding: 10px 14px;
+    border-radius: 4px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.result-ok { background: #d4edda; color: #2e7d32; }
+.result-bad { background: #f8d7da; color: #c0392b; }
+
+.badge-note {
+    display: inline-block;
+    font-size: 0.7em;
+    background: #eee;
+    color: #666;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.qty-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.qty-box span {
+    font-weight: bold;
+    min-width: 18px;
+    text-align: center;
+}
+
+.tabs {
+    margin-bottom: 16px;
+    border-bottom: 1px solid #ccc;
+}
+
+.tabs button {
+    background: none;
+    border: none;
+    padding: 8px 14px;
+    font-size: 0.9em;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+}
+
+.tabs button.active {
+    color: #0f766e;
+    border-bottom-color: #0f766e;
+    font-weight: bold;
+}

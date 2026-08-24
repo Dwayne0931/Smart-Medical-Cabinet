@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Import Medicines - Smart Medical Cabinet</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+    <div class="navbar">
+        <div class="brand">SMC - Clinic Inventory</div>
+        <div>
+            <a href="/">Dashboard</a>
+            <a href="/medicines">Medicines</a>
+            <a href="/scan">Verify</a>
+            <a href="/reports">Reports</a>
+            <a href="/about">About</a>
+            <a href="/logout">Logout ({{ session.username }})</a>
+        </div>
+    </div>
+
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+        {% for msg in messages %}
+        <div class="flash">{{ msg }}</div>
+        {% endfor %}
+        {% endwith %}
+
+        <h1>Import Medicines from CSV</h1>
+
+        <div class="card">
+            <p class="muted">
+                Upload a CSV file to add several medicines and their initial batch data at once.
+            </p>
+            <p>
+                Must have "medicine_id, name, dosage, category, barcode, location, low_stock_threshold, batch_id,
+                expiry_date, quantity"
+            </p>
+
+            <form method="POST" enctype="multipart/form-data" style="margin-top:14px;">
+                <input type="file" name="csv_file" accept=".csv" required>
+                <div style="margin-top:12px;">
+                    <button class="btn" type="submit">Import</button>
+                </div>
+            </form>
+            <p>Not Functional, will add soon</p>
+        </div>
+
+        <a class=btn href="/medicines">Back to Medicines</a>
+    </div>
+
+</body>
+
+</html>

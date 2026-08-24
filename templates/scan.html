@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Verify - Smart Medical Cabinet</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+    <div class="navbar">
+        <div class="brand">SMC - Clinic Inventory</div>
+        <div>
+            <a href="/">Dashboard</a>
+            <a href="/medicines">Medicines</a>
+            <a href="/scan">Verify</a>
+            <a href="/reports">Reports</a>
+            <a href="/about">About</a>
+            <a href="/logout">Logout ({{ session.username }})</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>Medicine Verification</h1>
+
+        <div class="tabs">
+            <button id="tabGuidedBtn" class="active" onclick="showTab('guided')">Guided Verification</button>
+            <button id="tabQuickBtn" onclick="showTab('quick')">Quick Scan</button>
+        </div>
+
+        <!-- ============ GUIDED VERIFICATION ============ -->
+        <div id="guidedSection">
+
+            <div class="card">
+                <h3>Step 1: Search and select medicine</h3>
+                <p class="muted">Search by name, tick the item and dose needed.</p>
+                <input type="text" id="searchInput" class="search-input"
+                    placeholder="Search medicine, e.g. Metformin...">
+                <div id="medList"></div>
+                <p class="muted" id="noResults" style="display:none;">No medicine matches your search.</p>
+                <p class="muted" id="moreResultsHint" style="display:none;"></p>
+            </div>
+
+            <div class="card">
+                <h3>Step 2: Locate in cabinet</h3>
+                <p class="muted">Toggle the light to the correct compartment.
+                </p>
+                <div id="selectedList"></div>
+                <p class="muted" id="noneSelected">No items selected</p>
+            </div>
+
+            <div class="card">
+                <h3>Step 3: Scan to verify</h3>
+                <p class="muted">Scan the barcode of the item you picked up.</p>
+                <div class="scan-row">
+                    <input type="text" id="guidedBarcodeInput" placeholder="Scan or type barcode...">
+                    <button class="btn" onclick="guidedScan()">Scan</button>
+                </div>
+                <p class="muted">Demo barcodes: <br>
+                    8991234500017 (Paracetamol) <br>
+                    90000000043 (Acyclovir 400mg) <br>
+                    8991234500048 (Metformin 1000mg) <br>
+                <div id="guidedMessage"></div>
+
+                <h3 style="margin-top:16px;">To Submit into Database</h3>
+                <div id="guidedReadyList"></div>
+                <p class="muted" id="guidedReadyNone">Nothing scanned yet.</p>
+                <button class="btn" id="guidedSubmitBtn" style="display:none;" onclick="submitGuided()">Submit</button>
+                <button class="btn btn-outline" id="guidedClearBtn" style="display:none;" onclick="clearGuided()">Clear
+                    All</button>
+            </div>
+
+        </div>
+
+        <!-- ============ QUICK SCAN ============ -->
+        <div id="quickSection" style="display:none;">
+
+            <div class="card">
+                <h3>Quick Scan</h3>
+                <p class="muted">
+                    Scanned item is verified and added to the list below to be submitted<br>
+                    (scanning the same item twice, quantity +1).
+
+                </p>
+                <div class="scan-row">
+                    <input type="text" id="quickBarcodeInput" placeholder="Scan barcode..." autofocus>
+                </div>
+                <div id="quickMessage"></div>
+            </div>
+
+            <div class="card">
+                <h3>Scanned Items</h3>
+                <div id="quickList"></div>
+                <p class="muted" id="quickNone">Nothing scanned yet.</p>
+                <button class="btn" id="quickSubmitBtn" style="display:none;" onclick="submitQuick()">Submit</button>
+                <button class="btn btn-outline" id="quickClearBtn" style="display:none;" onclick="clearQuick()">Clear
+                    All</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        var SEARCH_LIMIT = {{ search_limit }};
+    </script>
+    <script src="{{ url_for('static', filename='scan.js') }}"></script>
+</body>
+
+</html>
