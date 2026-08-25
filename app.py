@@ -29,7 +29,10 @@ EXPIRY_WARNING_DAYS = 30   # medicines expiring within this many days are flagge
 SEARCH_RESULT_LIMIT = 7    # verify page shows at most this many results per search
 
 # ESP8266 network configuration - change this to match your ESP8266's IP address
-ESP8266_BASE_URL = "http://10.130.15.33"
+# Read from .env, but keep the old IP as a safety fallback if the variable is missing
+ESP8266_BASE_URL = os.getenv("ESP8266_BASE_URL")
+if not ESP8266_BASE_URL:
+    raise RuntimeError("ESP8266_BASE_URL environment variable not set. Check your .env file.")
 
 # GLOBAL run for all request - Authenticate session for web access
 @app.before_request
@@ -524,16 +527,6 @@ def api_locate():
         return jsonify({"success": False, "message": "Medicine not found."}), 404
 
     led = medicine["led_index"]
-    if led is None:
-        # This medicine doesn't have a physical LED wired up.
-        # Still report success so the Locate button works in the demo,
-        # just without actually calling the ESP8266.
-        return jsonify({
-            "success": True,
-            "medicine_id": medicine_id,
-            "state": state,
-            "message": "No physical LED assigned to this medicine (simulated)."
-        })
 
     esp_url = f"{ESP8266_BASE_URL}/led?led={led}&state={state}"
 
@@ -709,4 +702,4 @@ def reports():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=False)
