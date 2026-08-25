@@ -123,6 +123,7 @@ function renderSelectedList() {
 }
 
 // Sends an on/off request to the ESP so the correct LED lights up.
+// Sends the medicine ID to flaskApp with ON, or OFF
 async function toggleLight(medicineId) {
     const item = selected[medicineId];
     const turningOn = item.status !== "lit";

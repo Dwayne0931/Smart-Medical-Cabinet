@@ -1,4 +1,4 @@
-# Smart Medicine Cabinet
+# Smart Medical Cabinet
 a web app for clinic staff to look up medicines, verify them
 by barcode before dispensing, and keep track of stock (quantities, expiry dates, batches).
 An ESP8266 + Arduino Uno light up a physical LED to help staff find the right medicine.
