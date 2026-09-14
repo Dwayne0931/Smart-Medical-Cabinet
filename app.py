@@ -62,15 +62,13 @@ def get_db():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "GET":
-        # Test the connection to database
+        # Test the connection to database, if mysql is not started / cant reach
         try:
             conn = get_db()
             conn.close()
         except pymysql.Error:
             flash("Database is currently unavailable. Please turn on MySQL Server/contact support.")
-    
-            
-            
+     
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
@@ -119,12 +117,13 @@ def register():
             return render_template("register.html", form=request.form)
 # TODO: change roles/ admin allow register user etc
         cursor.execute(
-            "INSERT INTO users (username, password_hash, role) VALUES (%s, %s, 'staff')",
+            "INSERT INTO users (username, password_hash, role) VALUES (%s, %s, 'admin')",
             (username, generate_password_hash(password))
         )
         conn.commit()
         cursor.close()
         conn.close()
+        
         flash("Account created. Please log in.")
         return redirect(url_for("login"))
     return render_template("register.html", form={})
@@ -500,14 +499,18 @@ def api_medicines_search():
     conn.close()
     return jsonify({"results": rows, "total": total, "limit": SEARCH_RESULT_LIMIT})
 
-
-# ---------- Communication with ESP8266 ------------
+####################################################
+# ---------- Communication with ESP8266 -----------#
+####################################################
 # NEED VERIFY Connection and popup if comms fail
 @app.route("/api/locate", methods=["POST"])
 def api_locate():
 # Turns a medicine's LED on or off by sending a request to the ESP8266.
 # Which physical LED to use comes from the medicine's led_index in the database 
-    data = request.get_json(silent=True) or {}
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({"success": False, "message": "A JSON request body is required."}), 400
+
     medicine_id = str(data.get("medicine_id", "")).strip()
     state = str(data.get("state", "")).lower().strip()
 
@@ -527,6 +530,8 @@ def api_locate():
         return jsonify({"success": False, "message": "Medicine not found."}), 404
 
     led = medicine["led_index"]
+    if led is None:
+        return jsonify({"success": False, "message": "No LED is configured for this medicine."}), 400
 
     esp_url = f"{ESP8266_BASE_URL}/led?led={led}&state={state}"
 
@@ -540,15 +545,22 @@ def api_locate():
             "state": state,
             "esp_response": esp_response
         })
-    except urllib.error.URLError as e:
+    except (urllib.error.URLError, TimeoutError) as e:
         return jsonify({"success": False, "message": f"Could not connect to ESP8266: {e}"}), 502
-
+# TODO: MAKE SURE USER KNOWS If esp is conneted ot not, check if in webpage it shows
 
 @app.route("/api/scan", methods=["POST"])
 def api_scan():
 # Handles the barcode scan receives the code the scanner types 
 # and query database
-    barcode = request.json.get("barcode", "").strip()
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({"found": False, "message": "A JSON request body is required."}), 400
+
+    barcode = str(data.get("barcode", "")).strip()
+    if not barcode:
+        return jsonify({"found": False, "message": "Barcode is required."}), 400
+
     conn = get_db()
     cursor = conn.cursor()
 
@@ -578,22 +590,51 @@ def api_scan():
 
 @app.route("/api/dispense", methods=["POST"])
 def api_dispense():
-    data = request.json
-    medicine_id = data["medicine_id"]
-    batch_id = data["batch_id"]
-    qty = int(data["quantity"])
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({"success": False, "message": "A JSON request body is required."}), 400
+
+    medicine_id = str(data.get("medicine_id", "")).strip()
+    batch_id = str(data.get("batch_id", "")).strip()
+    if not medicine_id or not batch_id:
+        return jsonify({"success": False, "message": "Medicine ID and batch ID are required."}), 400
+
+    try:
+        qty = int(data.get("quantity"))
+    except (TypeError, ValueError):
+        return jsonify({"success": False, "message": "Quantity must be a whole number."}), 400
+    if qty <= 0:
+        return jsonify({"success": False, "message": "Quantity must be greater than zero."}), 400
 
     conn = get_db()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM batches WHERE batch_id = %s", (batch_id,))
+    cursor.execute(
+        "SELECT * FROM batches WHERE batch_id = %s AND medicine_id = %s",
+        (batch_id, medicine_id)
+    )
     batch = cursor.fetchone()
 
-    if not batch or batch["quantity"] < qty:
+    if not batch:
         cursor.close()
         conn.close()
-        return jsonify({"success": False, "message": "Insufficient stock in this batch."})
+        return jsonify({"success": False, "message": "Batch does not belong to the selected medicine."}), 400
+    if batch["expiry_date"] < date.today():
+        cursor.close()
+        conn.close()
+        return jsonify({"success": False, "message": "Expired batches cannot be dispensed."}), 400
 
-    cursor.execute("UPDATE batches SET quantity = quantity - %s WHERE batch_id = %s", (qty, batch_id))
+    # Keep the quantity check in the UPDATE so concurrent requests cannot over-dispense.
+    cursor.execute(
+        "UPDATE batches SET quantity = quantity - %s "
+        "WHERE batch_id = %s AND medicine_id = %s AND quantity >= %s AND expiry_date >= %s",
+        (qty, batch_id, medicine_id, qty, date.today())
+    )
+    if cursor.rowcount != 1:
+        conn.rollback()
+        cursor.close()
+        conn.close()
+        return jsonify({"success": False, "message": "Insufficient stock in this batch."}), 400
+
     cursor.execute(
         "INSERT INTO transactions (medicine_id, batch_id, change_qty, action, performed_by, note) "
         "VALUES (%s, %s, %s, 'DISPENSE', %s, 'Verified by barcode scan')",
@@ -608,9 +649,16 @@ def api_dispense():
 def _dispense_fefo(cursor, medicine_id, qty, performed_by, note):
 # Dispenses qty units of a medicine using first-expiry-first-out across
 # whichever batches have stock, logging one transaction per batch touched
+    if qty <= 0:
+        return False, "Quantity must be greater than zero."
+
+    # Lock eligible batches until the caller commits, so a second request cannot
+    # consume the same stock between the availability check and the updates.
     cursor.execute(
-        "SELECT * FROM batches WHERE medicine_id = %s AND quantity > 0 ORDER BY expiry_date ASC",
-        (medicine_id,)
+        "SELECT * FROM batches "
+        "WHERE medicine_id = %s AND quantity > 0 AND expiry_date >= %s "
+        "ORDER BY expiry_date ASC FOR UPDATE",
+        (medicine_id, date.today())
     )
     batches = cursor.fetchall()
 
@@ -637,7 +685,16 @@ def _dispense_fefo(cursor, medicine_id, qty, performed_by, note):
 def api_bulk_dispense():
 # Used by Quick Scan: takes a list of {medicine_id, quantity} from
 # repeated scans and updates the database for all of them in one confirmation
-    items = request.json.get("items", [])
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({"success": False, "message": "A JSON request body is required."}), 400
+
+    items = data.get("items")
+    if not isinstance(items, list) or not items:
+        return jsonify({"success": False, "message": "A non-empty items list is required."}), 400
+    if any(not isinstance(item, dict) for item in items):
+        return jsonify({"success": False, "message": "Each item must be an object."}), 400
+
     conn = get_db()
     cursor = conn.cursor()
     results = []

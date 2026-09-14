@@ -128,16 +128,40 @@ async function toggleLight(medicineId) {
     const item = selected[medicineId];
     const turningOn = item.status !== "lit";
 
-    const response = await fetch("/api/locate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ medicine_id: medicineId, state: turningOn ? "on" : "off" })
-    });
-    const data = await response.json();
+    try {
+        const response = await fetch("/api/locate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ medicine_id: medicineId, state: turningOn ? "on" : "off" })
+        });
+        const data = await response.json();
 
-    if (data.success) {
+        if (!response.ok || !data.success) {
+            showLocateError(data.message || "Could not communicate with the ESP8266.");
+            return false;
+        }
+
         item.status = turningOn ? "lit" : "idle";
         renderSelectedList();
+        return true;
+    } catch (error) {
+        showLocateError("Could not communicate with the ESP8266. Check that it is powered on and connected.");
+        return false;
+    }
+}
+
+function showLocateError(message) {
+    const messageEl = document.getElementById("guidedMessage");
+    const box = document.createElement("div");
+    box.className = "result-box result-bad";
+    box.textContent = message;
+    messageEl.replaceChildren(box);
+}
+
+async function turnOffLocatedLights() {
+    const litMedicineIds = Object.keys(selected).filter(id => selected[id].status === "lit");
+    for (const medicineId of litMedicineIds) {
+        await toggleLight(medicineId);
     }
 }
 
@@ -208,7 +232,7 @@ async function submitGuided() {
     await submitReadyList(guidedReady, () => {
         guidedReady = {};
         renderGuidedReady();
-    });
+    }, turnOffLocatedLights);
 }
 
 
@@ -324,7 +348,7 @@ function renderReadyList(tally, listElId, emptyMessageId, submitBtnId, clearBtnI
 
 // Sends everything in the list to the server as one bulk dispense
 // request, then runs onDone() (usually clears the list) once finished.
-async function submitReadyList(tally, onDone) {
+async function submitReadyList(tally, onDone, onSuccessfulSubmit) {
     const items = Object.keys(tally).map(id => ({
         medicine_id: id,
         quantity: tally[id].qty
@@ -334,12 +358,24 @@ async function submitReadyList(tally, onDone) {
     const confirmed = confirm(`Submit ${items.length} item(s)? This will update the database.`);
     if (!confirmed) return;
 
-    const response = await fetch("/api/bulk_dispense", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items })
-    });
-    const data = await response.json();
+    let response;
+    let data;
+    try {
+        response = await fetch("/api/bulk_dispense", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ items })
+        });
+        data = await response.json();
+    } catch (error) {
+        alert("Could not submit the dispense request. Please try again.");
+        return;
+    }
+
+    if (!response.ok || !Array.isArray(data.results)) {
+        alert(data.message || "Could not submit the dispense request.");
+        return;
+    }
 
     const summaryLines = data.results.map(result => {
         const label = `${result.name || result.medicine_id} ${result.dosage || ""}`;
@@ -347,6 +383,10 @@ async function submitReadyList(tally, onDone) {
         return `${label}: ${outcome}`;
     });
     alert(summaryLines.join("\n"));
+
+    if (data.results.every(result => result.success) && onSuccessfulSubmit) {
+        await onSuccessfulSubmit();
+    }
 
     onDone();
 }
